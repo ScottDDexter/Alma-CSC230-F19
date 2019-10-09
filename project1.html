@@ -37,11 +37,54 @@
 
   <h3>Introduction</h3>
 
-  <p><a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman coding</a> is a data compression scheme that is used in many popular data formats, including zipfiles (most of which use the <a href="https://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a> format, incorporating Huffman coding and other techniques) and MP3 (which uses Huffman coding near the end of a < href="https://arstechnica.com/features/2007/10/the-audiofile-understanding-mp3-compression/3/">fairly complicated encoding process</>).</p>
+  <p><a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman coding</a> is a data compression scheme that is used in many popular data formats, including zipfiles (most of which use the <a href="https://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a> format, incorporating Huffman coding and other techniques) and MP3 (which uses Huffman coding near the end of a <a href="https://arstechnica.com/features/2007/10/the-audiofile-understanding-mp3-compression/3/">fairly complicated encoding process</a>).</p>
 
-  <p>What does "data compression" mean? It's the idea that a lot of the information we exchange contains some degree of "redundancy," so it takes up more space to store (or more time to transmit) than absolutely necessary. One quick (but highly imperfect) scheme for compressing English is smply t rmv ll th vwls. Note that while a compressed word like "t" could come from "it", "at," "to," and maybe more, the context makes it pretty clear what it should be. That's redundancy in action.</p>
+  <p>What does "data compression" mean? It's the idea that a lot of the information we exchange contains some degree of "redundancy," so it takes up more space to store (or more time to transmit) than absolutely necessary. One quick (but highly imperfect) scheme for compressing English is smply t rmv ll th vwls. Note that while a compressed word like "t" could come from "it", "at," "to," (and maybe other words?), the context makes it pretty clear what it should be. That's redundancy in action.</p>
 
   <p>Huffman coding can be applied any set of "symbols," and relies on the idea that the <i>most frequent</i> symbols should have the <i>shortest</i> representation. (In contrast, remember that the ASCII system for the symbols used on US keyboards uses 7 bits to represent every character, whether it's a super-common character like 'e' or a pretty rare one like '~'.) Of course, if we don't really know much about symbol frequency, or if every symbol is equally common, then Huffman coding can't really help us.
+
+    <h3>Project Overview</h3>
+  <p>In this project, you will implement Huffman coding using the book's LinkedBinaryTree and BinaryTreeNode. In particular, your program will
+    <ol>
+    <li>Read in a textfile (of ASCII text; you can assume that only symbols from the US keyboard will be in this file.
+    <li>Count the occurrence of each character in the file.
+    <li>Generate a tree representing the Huffman coding of each character in the file.
+    <li>Generate output representing the compressed version of the input.
+</ol>
+  </p>
+
+  <p>You should also write a simple decompressor that can read the compressed input and reconstruct the original input. That way you know whether your code works!</p>
+
+  <h3>Input and Frequency Table</h3>
+
+  <p>Your code should accept a filename on standard input; it should open this file, treating it as a textfile, and generate an (internal) table of the charagters in the file and their counts. You can see this in the wikipedia example <a href="https://en.wikipedia.org/wiki/Huffman_coding#/media/File:Huffman_coding_visualisation.svg">here</a>.</p>
+
+                                                                                                                                                                <p>What sort of object should you use to store these symbol counts? Note that below, it's going to be useful to sort these symbols by increasing count.</p>
+
+      <h3>Tree Generation</h3>
+
+  <p>The process of tree generation is illustrated in that diagram as well, and also described on <a href-"https://en.wikipedia.org/wiki/Huffman_coding#Compression">Wikipdia page</a>: the two least frequent symbols become leafs of a little tree, and their parent node represents an abstract "combined" symbol whose count is the sum of the two leaf counts. This process continues until all the symbols have a place in the tree. Algorithmically speaking, we sort the symbols by frequency, put them into a queue (as leaf nodes), and proceed by taking two nodes from the front of a queue and then enqueuing their "parent," continuing until there is only one node in the queue: this is the root of the whole tree. The wikpedia paragraph that starts "If the symbols are sorted by probability" gives some very good advice about how to use queues to achieve the best results.</p>
+
+  <p>As stated above, you must use the book's LinkedBinaryTree and BinaryTreeNode to represent your tree. (It's up to you to decide how to implement the queues.)</p>
+
+
+      <h3>Encoding</h3>
+  <p>Once the tree is built, you need to traverse the tree to produce the bit sequence corresponding to each symbol. ("Left" corresponds to 0; "right" corresponds to 1.) You'll want to make another table of symbols and bit sequences (or maybe you can just augment the table you created to begin with). For purposes of debugging and visualization, you should represent these bit sequences as <code>String</code>s of 0s and 1s.</p>
+
+  <p>Once you have the encoding table set up, you can encode the entire input file&mdash;as you read the input characters, output the corresponding bit sequence. Again, for debugging purposes, you should start by printing the stored "bit strings," but once you're confident in your code, you should output actual bits. To do that, you'll need a couple pieces of code. First, the <code>Integer</code> class has a lovely method that will convert a string into an int. You may already be familiar with <code>Integer.parseInt()</code>, but for this application we need to use <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/lang/Integer.html#parseUnsignedInt(java.lang.String,int)"><code>Integer.parseUnsignedInt()</code></a>. These are base-2 numbers, so the second parameter must be 2. The other piece of code you need is a class that will actually generate a bit sequence as output. For this, use this definition of <a href="https://www2.cs.duke.edu/courses/cps100e/fall09/assign/huff/src/src/BitOutputStream.java"><code>BitOutputStream</code></a>.</p>
+
+  <h3>Decoding</h3>
+
+  <p>Finally, note that the true test of any encoding scheme like this is whether it can be <i>decoded</i> to produce the original value. So, write a small companion program that decodes a compressed file and produces the uncompressed original data. This means that your compressed file needs to contain the "dictionary" of symbols and bit sequences that was generated for the encoding phase. The most straightforward way is to output that dictionary at the beginning of the compressed file (so that your decompressor can read it in before it starts decompressing). Fortunately, your decompressor does not need the whole Huffman tree, just the bit sequences corresponding to each symbol. Try to keep the space requirements of your dictionary to a minimum. You'll want to use the <a href="https://www2.cs.duke.edu/courses/cps100e/fall09/assign/huff/src/src/BitInputStream.java"><code>BitInputStream</code></a> class for this.</p>
+
+  <h3>Turning it in</h3>
+
+  <p>Your code should conform to the <a href="https://google.github.io/styleguide/javaguide.html">Google Java Style Guide</a> (not that Google has the BEST style guide, but it's pretty clear and covers the bases). If you have any questions about the contents of the style guide, please ask (well in advance of the deadline!). In particular, look closely at section 7 on javadoc. Use Eclipse's "Generate Javadoc" feature to put HTML documentation in your project's doc folder.</p>
+
+  <h3>Deadline</h3>
+  <p>This project is due at the beginning of class on Friday, October 25. Submit via Moodle.</p>
+
+
 
 
 
