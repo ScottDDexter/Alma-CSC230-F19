@@ -93,7 +93,7 @@ public class NetCheckers extends JFrame implements MouseListener {
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 	public void mouseClicked(MouseEvent e) {}
-	public void mouseMoved(MouseEvent e) {}
+	public void mouseMoved(MouseEvent e) {System.out.print("");}
 
 
 	public static void main(String[] args) {
