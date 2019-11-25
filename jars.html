@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!-- HTML5 Boilerplate -->
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+<>html>
+  <head>
+    <meta charset="utf-8"/>
+      <!-- Always force latest IE rendering engine & Chrome Frame -->
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+      <meta http-equiv="cleartype" content="on"/>
+
+<title>Working with Packages and Jarfiles</title>
+
+    <!-- Responsive and mobile friendly stuff -->
+    <!-- Stylesheets -->
+         <link rel="stylesheet" type="text/css" href="css/html5reset.css" media="all">
+	<link rel="stylesheet" type="text/css" href="css/col.css" media="all">
+	<link rel="stylesheet" type="text/css" href="css/8cols.css" media="all">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+</head>
+
+<body>
+  <div class="section group">
+    <div class="coursename span_8_of_8">
+      <a href="../index.html">CSC 230</a>
+    </div>
+  </div>
+
+  <div class="section group">
+    <div class="span_8_of_8">
+  <h2>Working with Pacakges and Jarfiles</h2>
+
+  <h3>Overview</h3>
+
+  <p>In today's exploration, we'll look at packages, directory structures, class paths (i.e. the CLASSPATH), and jarfiles. We'll mostly be working from the command line to make everything really visible.</p>
+
+  <p>So first, download this simple <a href="HelloWorld.java">HelloWorld.java</a> source file, save it somewhere, and then go to that folder from your command line. You should be able to compile it normally as <code>javac HelloWorld.java</code>. And then run it normally as <code>java HelloWorld</code>.</p>
+
+  <p>But "real" code usually lives in packages&mdash;both for organizing and branding purposes, and also (most importantly from a technical perspective) to create a kind of "namespace," so if your code defines a <code>Widget</code> class, it won't conflict with classes with the same name defined in other packages. (So, for example, you could define your own <code>ArrayList</code> that has nothing to do with the Java libraries). To put your class in a packages, all you have to do is add a <code>package</code> statement on the first line of your code. For our purposes, let's put HelloWorld into a package with
+
+    <pre>
+      package edu.alma.CSC230;</pre>
+
+    Now try to compile and run your code. What just happened?</p>
+
+  <p>Java requires packages naming to reflect an actual directory structure. I'll show you what that means and how the Java commands relate. Once that's done, download this very simple <a href="Counter.java">Counter</a> class definition. Notice its package declaration: where should this go? Add a Counter declaration to the HelloWorld class and see if you can get it to compile and run.</p>
+
+  <p>
+    OK, now we want to use some third-party code (OK, I'm really the third party, lightly repackaging some code from a fourth party). Here's a <a href="ttt.jar">jarfile</a> that contains some classes in the ttt package. To use it, <code>import ttt.*</code> and then add a few lines of code:
+    <pre>
+    System.out.println("Let's play tic tac toe!");
+    TicTacToePlayer p = new TicTacToePlayer();
+    p.play();</pre>
+
+    We can see what's in the jarfile with the <code>jar</code> command&mdash; try <code> jar tvf ttt.jar</code> ('t' for table, 'v' for verbose, 'f' for file). Anything strike you as curious? If there are any files you want to inspect in the jarfile, you might be able to use <code>unzip -p ttt.jar &lt;filename&gt;</code>.
+
+    Now we have a bit of problem... how do we tell this compiler where this package is? It doesn't really exist in any directory structure. So, we have to explicitly add it to the "classpath," which is the path where Java searches for classes and other resources (see <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/classpath.html">this official document</a> for more detail). I'll show you some options here.</p>
+
+  <p>Finally, let's make an "executable jar" for our now-excessive hello world application. The idea is that we should be able to say
+    <pre>
+      java -jar helloworld.jar</pre>
+
+    and have our application run. To do that, we need to use the <code>jar</code> command again, this time to create the jarfile. We'll also need to adjust the manifest to specify which class contains the main method that should be used as the entry point. (See, for example, <a href="http://www.skylit.com/javamethods/faqs/createjar.html">this discussion</a>)
+
+
+
+
+
+
+
+
+
+
+
+ <hr/>
+
+    </div>
+  </div>
+</body>
+</html>
