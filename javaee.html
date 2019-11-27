@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!-- HTML5 Boilerplate -->
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+<html>
+  <head>
+    <meta charset="utf-8"/>
+      <!-- Always force latest IE rendering engine & Chrome Frame -->
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+      <meta http-equiv="cleartype" content="on"/>
+
+<title>Java EE and Friends</title>
+
+    <!-- Responsive and mobile friendly stuff -->
+    <!-- Stylesheets -->
+         <link rel="stylesheet" type="text/css" href="css/html5reset.css" media="all">
+	<link rel="stylesheet" type="text/css" href="css/col.css" media="all">
+	<link rel="stylesheet" type="text/css" href="css/8cols.css" media="all">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+</head>
+
+<body>
+  <div class="section group">
+    <div class="coursename span_8_of_8">
+      <a href="../index.html">CSC 230</a>
+    </div>
+  </div>
+
+  <div class="section group">
+    <div class="span_8_of_8">
+  <h2>Java EE and Friends</h2>
+
+  <h3>Overview</h3>
+
+  <p>As today's reading illustrates, Java EE contains many APIs related generally to the need for Internet-based applications, particular for the software that "serve" these applications. In today's activity, we'll go through a simple activity to develop and deploy a (very simple) Java EE application. There are few more moving parts here, and we'll talk about those along the way.</p>
+
+  <h3>Getting Started</h3>
+
+  <p>Open Eclipse for EE, and create a new project of the "Dynamic Web Project" flavor. You'll need to give your project a name (<code>HelloWorld</code> is always good), but the rest of the settings are fine, so you can just click "Finish." Look at the structure of the project&mdash;everything is basically empty, but there's a lot more structure here than in a "basic" Java project; "Java Resources," "JavaScript Resources", "WebContent" and WEB-INF.... Our Java code will go in "Java Resources," and the logic that produces webpages will go in WebContent. (If we were to need JavaScript for our webpages, that would go in JavaScript Resources.)</p>
+
+  <p>Before we can do much, we need to add the servlet JAR I asked you to download. In the Project Properties, go to the "Java BuildPath" screen, and highlight "ClassPath." Then click "Add External JARs..." and find the jarfile you downloaded.</p>
+
+  <p>Let's also add simple, basic HTML page to the project (this may be the only bit that ends up actually working...). Right-click on the <code>WEB-INF</code> folder, and select New->HTML File. Name the file helloworld.html. And when the page appears for editing, make the body:
+    <pre>&lt;body&gt;Hello World!&lt;/body&gt;</pre>
+
+  <h3>Writing a Servlet</h3>
+
+  <p>The next thing we want is a little bit of Java code that will tell our webserver what to do when someone contacts it. This is a "servlet." We'll talk about why it's called that once we have the code in front of us. To proceed, right-click on the project's "Java Resources," select "New" and "Servlet." Give it a name (<code>HelloWorldServlet</code>?) and then click through the "Next" screens to see the options (no need to change anything, but just take a look). Some things to note:
+    <ul>
+      <li>the superclass is automatically named as <code>javax.servlet.http.HttpServlet</code>&mdash; you can peruse the documentation for this abstract class <a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpServlet.html">here</a> (note this is javaee documentation, though it looks like all the other Java documentation we've seen).</li>
+      <li>there's a thing called "URL mappings"</li>
+      <li>we have a lot of options about generating method stubs&mdash;the default choices are constructors, <code>doGet</code>, and <code>doPost</code>, but other choices are available.</li>
+    </ul>
+    No need to change any of those settings; once you've clicked "Finish" your Java code template should appear.</p>
+
+  <p>Most of the code is fine as it is, but we need to add at least at <i>little</i> behavior, so replace the body of <code>doGet</code> with
+    <pre>
+ String message = "Happy Coding!";
+
+ request.setAttribute("message", message);
+ request.getRequestDispatcher("WEB-INF/HelloWorld.jsp").forward(request,response);</pre>
+
+    In essence, we're taking the <code>request</code> and <code>response</code> references we received and sending them on to a JSP page (that's "Java Server Pages" about which you can read more <a href="https://docs.oracle.com/javaee/5/tutorial/doc/bnagx.html">here</a>, if you like.), and adding a new attribute, <code>message</code>, to the <code>request</code> object.</p>
+
+  <p>And that's all our very simple servlet does... but that JSP page doesn't exist yet!</p>
+
+  <h3>Write a JSP page</h3>
+
+  <p>It's pretty obvious from our servlet code where that JSP page needs to go: right click on <code>WEB-INF</code> and create a New... JSP File. Make sure the name matches the name we used in the servlet: <code>HellowWorld.jsp</code>. The contents of the html element should be:
+    <pre>
+    &lt;html&gt;
+	&lt;head&gt;
+		&lt;title&gt;Hello World&lt;/title>&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;h1&gt;Hello World&lt;/h1&gt;
+		&lt;p&gt;Message: ${message}&lt;/p&gt;
+	&lt;/body>&gt;
+    &lt;/html&gt;</pre>
+
+    This is <i>almost</i> normal HTML, except the bit with the curly braces&mdash;that's known as "Expression Language" (EL) (see <a href="https://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html">the documentation</a> for more details, if you like&mdash;essentially, this is a "lightweight" way to access the data in various Java objects flying around a server-side applications). Because this page is being served by a Java application, we can mix in various kinds of Java code with the page content&mdash;this bit of EL is just a small example.</p>
+
+  <h3>Configuring the application</h3>
+
+  <p>The last bits are about hooking this up to a server (which will be running on your laptop shortly). First, we need to declare the "address" of our simple little page. To do that, we need an information file called <code>web.xml</code> stored in <code>WEB-INF</code>. So create a New item in <code>WEB-INF</code>, but you'll have to select "Other," then scroll the resulting list to "XML." Within XML, select "XML File," and name the file <code>web.xml</code>.</p>
+
+  <p>You'll probably see gray and white horizontal bars&mdash;this is the "design" view of the XML file. Select "Source" instead at the bottom of the window, and then replace everything there with
+
+    <pre>
+&lt;web-app
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	version="3.1"&gt;
+
+	&lt;servlet&gt;
+		&lt;servlet-name&gt;HelloWorldServlet&lt;/servlet-name&gt;
+		&lt;servlet-class&gt;HelloWorldServlet&lt;/servlet-class&gt;
+	&lt;/servlet&gt;
+
+	&lt;servlet-mapping&gt;
+		&lt;servlet-name&gt;HelloWorldServlet&lt;/servlet-name&gt;
+		&lt;url-pattern&gt;index.html&lt;/url-pattern&gt;
+	&lt;/servlet-mapping&gt;
+
+&lt;/web-app&gt;</pre></p>
+
+  <p>And last step: set this up as a jetty application. Go to the <code>Run</code> menu and pick <code>Run Configurations...</code>. Pick "Jetty Webapp," then click the "New configuration" in the top left (which is like a little white square with an even littler yellow plus sign). Make a few settings here and we're good to go:
+    <ul>
+      <li><code>ContextPath</code> set to <code>HelloWorld</code></li>
+      <li>
+
+
+
+
+
+ <Hr/>
+
+    </div>
+  </div>
+</body>
+</html>
